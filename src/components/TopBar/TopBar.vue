@@ -6,7 +6,9 @@ import { FormInput } from "../../base-components/Form";
 import { Menu, Popover } from "../../base-components/Headless";
 import fakerData from "../../utils/faker";
 import _ from "lodash";
+import { authStore } from "../../stores/Auth";
 import { TransitionRoot } from "@headlessui/vue";
+import { useRouter } from "vue-router";
 
 const searchDropdown = ref(false);
 const showSearchDropdown = () => {
@@ -14,6 +16,20 @@ const showSearchDropdown = () => {
 };
 const hideSearchDropdown = () => {
   searchDropdown.value = false;
+};
+const store = authStore();
+const router = useRouter();
+
+const logout = async () => {
+  
+  try {
+    const response: any = await authStore().logout();
+    // if (response?.status == 204) {
+      router.push("/auth/login");
+    // }
+  } catch (error) {
+    console.log(error);
+  }
 };
 </script>
 
@@ -191,27 +207,27 @@ const hideSearchDropdown = () => {
       </Menu.Button>
       <Menu.Items class="w-56 mt-px text-white bg-primary">
         <Menu.Header class="font-normal">
-          <div class="font-medium">{{ fakerData[0].users[0].name }}</div>
+          <div class="font-medium" style="text-transform: capitalize;">{{ store.user.identity }}</div>
           <div class="text-xs text-white/70 mt-0.5 dark:text-slate-500">
-            {{ fakerData[0].jobs[0] }}
+            {{ store.user.email }}
           </div>
         </Menu.Header>
         <Menu.Divider class="bg-white/[0.08]" />
         <Menu.Item class="hover:bg-white/5">
-          <Lucide icon="User" class="w-4 h-4 mr-2" /> Profile
+          <Lucide icon="User" class="w-4 h-4 mr-2" /> Perfil
         </Menu.Item>
-        <Menu.Item class="hover:bg-white/5">
+        <!-- <Menu.Item class="hover:bg-white/5">
           <Lucide icon="Edit" class="w-4 h-4 mr-2" /> Add Account
-        </Menu.Item>
+        </Menu.Item> -->
         <Menu.Item class="hover:bg-white/5">
-          <Lucide icon="Lock" class="w-4 h-4 mr-2" /> Reset Password
+          <Lucide icon="Lock" class="w-4 h-4 mr-2" /> Reestablecer contraseña
         </Menu.Item>
-        <Menu.Item class="hover:bg-white/5">
+        <!-- <Menu.Item class="hover:bg-white/5">
           <Lucide icon="HelpCircle" class="w-4 h-4 mr-2" /> Help
-        </Menu.Item>
+        </Menu.Item> -->
         <Menu.Divider class="bg-white/[0.08]" />
-        <Menu.Item class="hover:bg-white/5">
-          <Lucide icon="ToggleRight" class="w-4 h-4 mr-2" /> Logout
+        <Menu.Item class="hover:bg-white/5" @click="logout()">
+          <Lucide icon="ToggleRight" class="w-4 h-4 mr-2" /> Salir
         </Menu.Item>
       </Menu.Items>
     </Menu>
