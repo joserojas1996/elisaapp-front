@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+
+
 import SideMenu from "../layouts/SideMenu/SideMenu.vue";
 import Dashboard from "../pages/Dashboard/index.vue";
 import Page2 from "../pages/Page2.vue";
@@ -12,11 +14,15 @@ import Bitacora from "../pages/ActivityCenter/index.vue";
 import Assignment from "../pages/Assignment/index.vue";
 import Movement from "../pages/Movement/index.vue";
 import CreatedOrUpdate from "../pages/Inventory/CreatedOrUpdate.vue";
+import TermsAndConditions from "../pages/TermsAndConditions/index.vue";
+import AuthRequired from "../services/AuthRequired";
+
 
 const routes = [
   {
     path: "/",
     component: SideMenu,
+    beforeEnter: AuthRequired,
     children: [
       {
         path: "/",
@@ -71,9 +77,14 @@ const routes = [
     component: Forgot,
   },
   {
-    path: "/restore-password",
+    path: "/password/reset",
     name: "restore-password",
     component: Restore,
+  },
+  {
+    path: "/terms-and-conditions",
+    name: "terms-and-conditions",
+    component: TermsAndConditions,
   },
 ];
 
@@ -85,11 +96,11 @@ const router = createRouter({
   },
 });
 
-router.beforeEach(async (to, from, next) => {
+// router.beforeEach(async (to, from, next) => {
 
-  const isAuthenticated: any = sessionStorage.getItem('auth');
-  console.log(isAuthenticated)
-  next()
-})
+//   const isAuthenticated: any = sessionStorage.getItem('auth');
+//   console.log(isAuthenticated)
+//   next()
+// })
 
 export default router;
