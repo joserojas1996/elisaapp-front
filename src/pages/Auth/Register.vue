@@ -185,7 +185,7 @@ const levelOfSegurity = computed(() => {
                 obtener su cuenta.
               </div>
               <div class="mt-5 text-lg text-white -intro-x text-opacity-70 dark:text-slate-400">
-                Gestione el proceso de adquisición de bienes desde un solo lugar.
+                La ERP nos permite ofrecer un mejor servicio a nuestros clientes.
               </div>
             </div>
           </div>
@@ -202,10 +202,15 @@ const levelOfSegurity = computed(() => {
               </div>
               <div class="mt-8 intro-x">
                 <!-- IDENTITY -->
-                <FormInput type="text" class="block px-4 py-3 intro-x login__input min-w-full xl:min-w-[350px]" :class="{
-                  'border-danger': v$.identity.$error,
-                }" placeholder="Cedúla" @keyup="onSearch()" v-model.trim="v$.identity.$model"
-                  @blur="v$.identity.$touch" />
+                <FormInput type="text" class="block px-4 py-3 intro-x login__input min-w-full xl:min-w-[350px]" 
+                  :class="{
+                    'border-danger': v$.identity.$error,
+                  }" 
+                  placeholder="Cedúla"
+                  @keyup="onSearch()"
+                  v-model.trim="v$.identity.$model"
+                  @blur="v$.identity.$touch" 
+                />
                 <template v-if="v$.identity.$error">
                   <div v-for="(error, index) in v$.identity.$errors" :key="index" class="mt-1 text-danger">
                     <span v-if="error.$validator == 'required'" class="error">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Lucide from "../../../base-components/Lucide";
-import { Menu, Dialog, Slideover } from "../../../base-components/Headless";
+import { Dialog } from "../../../base-components/Headless";
 import Button from "../../../base-components/Button";
 import LoadingIcon from "../../../base-components/LoadingIcon"
 import { FormInput, FormSelect, FormLabel } from "../../../base-components/Form";
@@ -11,7 +11,9 @@ import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { stringToHTML } from "../../../utils/helper";
 import Toastify from "toastify-js";
 import Notification from "../../../base-components/Notification";
-import { usersStore } from "../../../stores/Users/index";
+import { rolesStore } from "../../../stores/Roles/index";
+import { permissionsStore } from "../../../stores/Permissions/index";
+
 import CreatedOrUpdate from './createdOrUpdate.vue'
 import TomSelect from "../../../base-components/TomSelect"
 
@@ -23,19 +25,18 @@ interface Response {
   status?: string;
 }
 
-const store = usersStore();
+const store = rolesStore();
 
 const filter = reactive({
-  search: '',
-  active: '',
-  role: '',
+  search: null,
+  status: null,
   page: 1,
   per_page: 10,
 
 });
 
 onMounted(async () => {
-  await usersStore().index(filter)
+  await rolesStore().index(filter)
   initTabulator();
   reInitOnResizeWindow();
 });
@@ -43,7 +44,7 @@ onMounted(async () => {
 // Filter function
 const onFilter = async () => {
   if (tabulator.value) {
-    await usersStore().index(filter);
+    await rolesStore().index(filter);
   }
 };
 
@@ -54,11 +55,9 @@ const deleteButtonRef = ref();
 const deleteData = ref();
 
 const setDeleteModalPreview = ref(false);
-const setHeaderFooterSlideoverPreview = ref();
 
-
-const onEdit = (data: any) => {
-  headerFooterSlideoverPreview.value = true
+const edit = (data: any = null) => {
+  headerFooterSlideoverPreview.value = !headerFooterSlideoverPreview.value
 };
 
 const onDelete = (data: any) => {
@@ -67,7 +66,7 @@ const onDelete = (data: any) => {
 };
 
 const deleteUser = async () => {
-  const response: any = await usersStore().delete(deleteData.value);
+  const response: any = await rolesStore().delete(deleteData.value);
 
   if (response?.status == 200) {
 
@@ -86,21 +85,15 @@ const deleteUser = async () => {
     }).showToast();
     setDeleteModalPreview.value = !setDeleteModalPreview.value
 
-    await usersStore().index(filter);
+    await rolesStore().index(filter);
   }
 
 };
 
-
-
-// const imageAssets = import.meta.glob<{
-//   default: string;
-// }>("/src/assets/images/fakers/*.{jpg,jpeg,png,svg}", { eager: true });
-
 const initTabulator = () => {
   if (tableRef.value) {
     tabulator.value = new Tabulator(tableRef.value, {
-      data: store.usersList.data,
+      data: store.getRoles.data,
       reactiveData: true,
       paginationSize: 10,
       paginationSizeSelector: [10, 20, 30, 40],
@@ -120,25 +113,9 @@ const initTabulator = () => {
 
         // For HTML table
         {
-          title: "NOMBRE DE USUARIO",
-          minWidth: 200,
-          responsive: 0,
-          field: "username",
-          vertAlign: "middle",
-          print: false,
-          download: false,
-          formatter(cell) {
-            const response: any = cell.getData();
-            return `<div>
-                <div class="font-medium whitespace-nowrap">${response.username}</div>
-                <div class="text-xs text-slate-500 whitespace-nowrap">${response.correlative}</div>
-              </div>`;
-          },
-        },
-        {
           title: "NOMBRE",
           minWidth: 200,
-          field: "name",
+          field: "label",
           hozAlign: "left",
           headerHozAlign: "left",
           vertAlign: "middle",
@@ -146,9 +123,9 @@ const initTabulator = () => {
           download: false,
         },
         {
-          title: "CORREO",
+          title: "SLUG",
           minWidth: 200,
-          field: "email",
+          field: "name",
           hozAlign: "left",
           headerHozAlign: "left",
           vertAlign: "middle",
@@ -167,15 +144,13 @@ const initTabulator = () => {
           download: false,
           formatter(cell) {
             const response: any = cell.getData();
-            return `<div class="flex items-center lg:justify-center ${response.isActive ? "text-success" : "text-danger"
-              }">
-                <i data-lucide="${response.isActive ? "check-square" : "x-square"}" class="w-4 h-4 mr-2"></i> ${response.isActive ? "Activo" : "Inactivo"
-              }
+            return `<div class="flex items-center lg:justify-center text-success">
+                <i data-lucide="check-square" class="w-4 h-4 mr-2"></i>  Habilitado
               </div>`;
           },
         },
         {
-          title: "ROLE",
+          title: "PERMISOS",
           minWidth: 200,
           field: "role",
           hozAlign: "left",
@@ -184,8 +159,16 @@ const initTabulator = () => {
           print: false,
           download: false,
           formatter(cell) {
-            const response: any = cell.getData();
-            return response.role ? `<div>${response.role} </div>` : "";
+            const response:any = cell.getData();
+            let content = '<p class="flex items-center lg:justify-center">';
+
+            for (let i = 0; i < response.permissions.length; i++) {
+              content += `- ${response.permissions[i]} <br>`;
+            }
+
+            content += '</p>';
+
+            return content;
           },
         },
         {
@@ -213,7 +196,7 @@ const initTabulator = () => {
               const action = target.getAttribute("name");
               const response: any = cell.getData();
               if (action === "edit") {
-                onEdit(response);
+                edit(response);
               } else if (action === "delete") {
                 onDelete(response);
               }
@@ -221,48 +204,8 @@ const initTabulator = () => {
             a.addEventListener("click", handleActionClick)
             return a;
           },
-        },
-
-        // For print format
-        {
-          title: "NOMBRE",
-          field: "name",
-          visible: false,
-          print: true,
-          download: true,
-        },
-        {
-          title: "CORRELATIVE",
-          field: "correlative",
-          visible: false,
-          print: true,
-          download: true,
-        },
-        {
-          title: "EMAIL",
-          field: "email",
-          visible: false,
-          print: true,
-          download: true,
-        },
-        {
-          title: "STATUS",
-          field: "isActive",
-          visible: false,
-          print: true,
-          download: true,
-          formatterPrint(cell) {
-            return cell.getValue() ? "Active" : "Inactive";
-          },
-        },
-        {
-          title: "ROL",
-          field: "role",
-          visible: false,
-          print: true,
-          download: true,
-        },
-      ],
+        }
+      ]
     });
   }
 
@@ -293,17 +236,15 @@ const reInitOnResizeWindow = () => {
   });
 };
 
-
-
 </script>
 
 <template>
   <div>
     <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
-      <h2 class="mr-auto text-lg font-medium">Gestion de usuarios</h2>
+      <h2 class="mr-auto text-lg font-medium">Gestion de roles y permisos</h2>
       <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
-        <Button variant="primary" class="mr-2 shadow-md" @click="headerFooterSlideoverPreview = true">
-          Nuevo usuario
+        <Button variant="primary" class="mr-2 shadow-md" @click="edit()">
+          <Lucide icon="Plus" class="w-4 h-4 mr-2" /> Agregar
         </Button>
       </div>
     </div>
@@ -317,31 +258,9 @@ const reInitOnResizeWindow = () => {
           ">
           <div class="items-center mt-2 sm:flex sm:mr-4 xl:mt-0">
             <FormInput id="tabulator-html-filter-value" v-model="filter.search" type="text"
-              class="mt-2 sm:w-75 2xl:w-full sm:mt-0" placeholder="Buscar..." />
-          </div>
-
-          <div class="items-center sm:flex sm:mr-4">
-            <TomSelect v-model="filter.active" :options="{
-              placeholder: 'Seleccione un rol',
-            }">
-              <option :value="0">Inhabilitado</option>
-              <option :value="1">Habilitado</option>
-
-            </TomSelect>
-          </div>
-          <div class="items-center mt-2 sm:flex sm:mr-4 xl:mt-0">
-            <TomSelect v-model="filter.role" :options="{
-              placeholder: 'Seleccione un rol',
-            }" class="w-full">
-              <option value="1">Super Admin</option>
-            </TomSelect>
+              class="mt-2 sm:w-100 2x1:w-full sm:mt-0" placeholder="Buscar..." />
           </div>
         </form>
-        <div class="flex mt-5 sm:mt-0">
-          <Button variant="outline-secondary" class="w-full sm:w-auto">
-            <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Descargar
-          </Button>
-        </div>
       </div>
 
       <div class="overflow-x-auto scrollbar-hidden">
@@ -386,39 +305,6 @@ const reInitOnResizeWindow = () => {
       </div>
     </Notification>
 
-    <Slideover backdrop="static" :open="headerFooterSlideoverPreview" @close="() => {
-      setHeaderFooterSlideoverPreview(false);
-    }
-      ">
-      <!-- BEGIN: Slide Over Header -->
-      <Slideover.Panel>
-        <a @click="headerFooterSlideoverPreview = false" class="absolute top-0 left-0 right-auto mt-4 -ml-12" href="#">
-          <Lucide icon="X" class="w-8 h-8 text-slate-400" />
-        </a>
-        <Slideover.Title>
-          <h2 class="mr-auto text-base font-medium">
-            Nuevo usuario
-          </h2>
-        </Slideover.Title>
-        <!-- END: Slide Over Header -->
-        <!-- BEGIN: Slide Over Body -->
-        <Slideover.Description>
-          <CreatedOrUpdate />
-        </Slideover.Description>
-        <!-- END: Slide Over Body -->
-        <!-- BEGIN: Slide Over Footer -->
-        <Slideover.Footer>
-          <Button variant="outline-secondary" type="button" @click=" headerFooterSlideoverPreview = false"
-            class="w-20 mr-2">
-            Cancelar
-          </Button>
-          <Button variant="primary" type="button" class="w-20">
-            Actualizar
-          </Button>
-        </Slideover.Footer>
-      </Slideover.Panel>
-      <!-- END: Slide Over Footer -->
-    </Slideover>
-
+    <CreatedOrUpdate :foo="headerFooterSlideoverPreview" />
   </div>
 </template>

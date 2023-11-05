@@ -174,8 +174,7 @@ const levelOfSegurity = computed(() => {
               <div
                 class="mt-5 text-lg text-white -intro-x text-opacity-70 dark:text-slate-400"
               >
-                Gestione el proceso de adquisición de bienes desde un solo
-                lugar.
+              La ERP nos permite ofrecer un mejor servicio a nuestros clientes.
               </div>
             </div>
           </div>

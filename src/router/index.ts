@@ -15,6 +15,10 @@ import Assignment from "../pages/Assignment/index.vue";
 import Movement from "../pages/Movement/index.vue";
 import CreatedOrUpdate from "../pages/Inventory/CreatedOrUpdate.vue";
 import TermsAndConditions from "../pages/TermsAndConditions/index.vue";
+import UserManagement from "../pages/Admin/Users/index.vue";
+import RolesPermissions from "../pages/Admin/RolesAndPermissions/index.vue";
+
+
 import AuthRequired from "../services/AuthRequired";
 
 
@@ -58,6 +62,16 @@ const routes = [
         path: "/movement",
         name: "movement",
         component: Movement,
+      },
+      {
+        path: "/user-management",
+        name: "user-management",
+        component: UserManagement,
+      },
+      {
+        path: "/roles-permissions",
+        name: "roles-permissions",
+        component: RolesPermissions,
       },
     ],
   },

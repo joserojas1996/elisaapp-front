@@ -213,13 +213,13 @@ const logout = async () => {
           </div>
         </Menu.Header>
         <Menu.Divider class="bg-white/[0.08]" />
-        <Menu.Item class="hover:bg-white/5">
+        <Menu.Item class="hover:bg-white/5"  as="a"  @click="router.push({name: 'profile'});">
           <Lucide icon="User" class="w-4 h-4 mr-2" /> Perfil
         </Menu.Item>
         <!-- <Menu.Item class="hover:bg-white/5">
           <Lucide icon="Edit" class="w-4 h-4 mr-2" /> Add Account
         </Menu.Item> -->
-        <Menu.Item class="hover:bg-white/5">
+        <Menu.Item class="hover:bg-white/5" as="a" @click="router.push({name: 'forgotPassword'});">
           <Lucide icon="Lock" class="w-4 h-4 mr-2" /> Reestablecer contraseña
         </Menu.Item>
         <!-- <Menu.Item class="hover:bg-white/5">

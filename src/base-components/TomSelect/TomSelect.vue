@@ -46,8 +46,8 @@ const computedOptions = computed(() => {
         return confirm(
           values.length > 1
             ? "Are you sure you want to remove these " +
-                values.length +
-                " items?"
+            values.length +
+            " items?"
             : 'Are you sure you want to remove "' + values[0] + '"?'
         );
       },
@@ -110,17 +110,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <select
-    ref="tomSelectRef"
-    :value="props.modelValue"
-    @change="
-      (event) => {
-        emit('update:modelValue', (event.target as HTMLSelectElement).value);
-      }
-    "
-    v-select-directive
-    class="tom-select"
-  >
+  <select ref="tomSelectRef" :value="props.modelValue" @change="(event) => {
+    emit('update:modelValue', (event.target as HTMLSelectElement).value);
+  }
+    " v-select-directive class="tom-select">
     <slot></slot>
   </select>
 </template>

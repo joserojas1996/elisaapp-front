@@ -87,34 +87,39 @@ export const useSideMenuStore = defineStore("sideMenu", {
         title: "Mantenedores",
         subMenu: [
           {
-            icon: "Activity",
+            icon: "Minus",
             pageName: "side-menu-dashboard-overview-1",
             title: "Areas",
           },
           {
-            icon: "Activity",
+            icon: "Minus",
             pageName: "side-menu-dashboard-overview-1",
             title: "Proveedores",
           },
           {
-            icon: "Activity",
+            icon: "Minus",
             pageName: "side-menu-page-2",
             title: "Responsables",
           },
           {
-            icon: "Activity",
+            icon: "Minus",
             pageName: "side-menu-dashboard-overview-1",
             title: "Tipos de pagos",
           },
           {
-            icon: "Activity",
+            icon: "Minus",
             pageName: "side-menu-dashboard-overview-1",
             title: "Ubicaciones",
           },
           {
-            icon: "Activity",
-            pageName: "side-menu-dashboard-overview-1",
+            icon: "Minus",
+            pageName: "user-management",
             title: "Gestion de usuarios",
+          },
+          {
+            icon: "Minus",
+            pageName: "roles-permissions",
+            title: "Roles y permisos",
           },
         ],
       },
