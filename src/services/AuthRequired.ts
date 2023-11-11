@@ -9,8 +9,6 @@ export default async (to: any, from: any, next: any) => {
   let user = store.userAuth
   let check = store.check
   
-  console.log(user)
-  
   if (check) {
     if (!user) {
       next('/auth/login')

@@ -3,8 +3,7 @@ import Lucide from "../../../base-components/Lucide";
 import { Dialog } from "../../../base-components/Headless";
 import Button from "../../../base-components/Button";
 import LoadingIcon from "../../../base-components/LoadingIcon"
-import { FormInput, FormSelect, FormLabel } from "../../../base-components/Form";
-import * as xlsx from "xlsx";
+import { FormInput, FormSelect } from "../../../base-components/Form";
 import { onMounted, ref, reactive } from "vue";
 import { createIcons, icons } from "lucide";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
@@ -12,10 +11,8 @@ import { stringToHTML } from "../../../utils/helper";
 import Toastify from "toastify-js";
 import Notification from "../../../base-components/Notification";
 import { rolesStore } from "../../../stores/Roles/index";
-import { permissionsStore } from "../../../stores/Permissions/index";
-
 import CreatedOrUpdate from './createdOrUpdate.vue'
-import TomSelect from "../../../base-components/TomSelect"
+import Pagination from "../../../base-components/Pagination";
 
 
 interface Response {
@@ -26,6 +23,14 @@ interface Response {
 }
 
 const store = rolesStore();
+const tableRef = ref<HTMLDivElement>();
+const tabulator = ref<Tabulator>();
+const headerFooterSlideoverPreview = ref(false);
+const deleteButtonRef = ref();
+const deleteData = ref();
+const editData = ref({});
+
+const isLoading = ref(false);
 
 const filter = reactive({
   search: null,
@@ -36,10 +41,15 @@ const filter = reactive({
 });
 
 onMounted(async () => {
+  onLoadData()
+});
+
+// Filter function
+const onLoadData = async () => {
   await rolesStore().index(filter)
   initTabulator();
   reInitOnResizeWindow();
-});
+};
 
 // Filter function
 const onFilter = async () => {
@@ -48,15 +58,10 @@ const onFilter = async () => {
   }
 };
 
-const tableRef = ref<HTMLDivElement>();
-const tabulator = ref<Tabulator>();
-const headerFooterSlideoverPreview = ref(false);
-const deleteButtonRef = ref();
-const deleteData = ref();
-
 const setDeleteModalPreview = ref(false);
 
-const edit = (data: any = null) => {
+const edit = (data: any = {}) => {
+  editData.value = data
   headerFooterSlideoverPreview.value = !headerFooterSlideoverPreview.value
 };
 
@@ -66,12 +71,12 @@ const onDelete = (data: any) => {
 };
 
 const deleteUser = async () => {
+  isLoading.value = true
   const response: any = await rolesStore().delete(deleteData.value);
 
   if (response?.status == 200) {
-
     const failedEl = document
-      .querySelectorAll("#failed-notification-content")[0]
+      .querySelectorAll("#delete-notification")[0]
       .cloneNode(true) as HTMLElement;
     failedEl.classList.remove("hidden");
     Toastify({
@@ -83,22 +88,25 @@ const deleteUser = async () => {
       position: "right",
       stopOnFocus: true,
     }).showToast();
+
     setDeleteModalPreview.value = !setDeleteModalPreview.value
-
-    await rolesStore().index(filter);
+    onLoadData();
   }
-
+  isLoading.value = false
 };
 
 const initTabulator = () => {
   if (tableRef.value) {
     tabulator.value = new Tabulator(tableRef.value, {
       data: store.getRoles.data,
-      reactiveData: true,
-      paginationSize: 10,
-      paginationSizeSelector: [10, 20, 30, 40],
+      pagination: true,
+      paginationMode: "local",
       layout: "fitColumns",
       responsiveLayout: "collapse",
+      paginationInitialPage: 1,
+      paginationSize: 10,
+      paginationSizeSelector: [10, 20, 30, 40],
+      paginationCounter:"rows",
       placeholder: "No se han encontrado registros",
       columns: [
         {
@@ -110,8 +118,6 @@ const initTabulator = () => {
           resizable: false,
           headerSort: false,
         },
-
-        // For HTML table
         {
           title: "NOMBRE",
           minWidth: 200,
@@ -125,7 +131,7 @@ const initTabulator = () => {
         {
           title: "SLUG",
           minWidth: 200,
-          field: "name",
+          field: "label",
           hozAlign: "left",
           headerHozAlign: "left",
           vertAlign: "middle",
@@ -159,15 +165,12 @@ const initTabulator = () => {
           print: false,
           download: false,
           formatter(cell) {
-            const response:any = cell.getData();
+            const response: any = cell.getData();
             let content = '<p class="flex items-center lg:justify-center">';
-
             for (let i = 0; i < response.permissions.length; i++) {
-              content += `- ${response.permissions[i]} <br>`;
+              content += `- ${response.permissions[i].label} <br>`;
             }
-
             content += '</p>';
-
             return content;
           },
         },
@@ -212,9 +215,7 @@ const initTabulator = () => {
   tabulator.value?.on("renderComplete", () => {
     createIcons({
       icons,
-      attrs: {
-        "stroke-width": 1.5,
-      },
+      attrs: { "stroke-width": 1.5 },
       nameAttr: "data-lucide",
     });
   });
@@ -255,7 +256,7 @@ const reInitOnResizeWindow = () => {
           e.preventDefault();
           onFilter();
         }
-          ">
+        ">
           <div class="items-center mt-2 sm:flex sm:mr-4 xl:mt-0">
             <FormInput id="tabulator-html-filter-value" v-model="filter.search" type="text"
               class="mt-2 sm:w-100 2x1:w-full sm:mt-0" placeholder="Buscar..." />
@@ -268,6 +269,7 @@ const reInitOnResizeWindow = () => {
           <LoadingIcon icon="tail-spin" class="mr-1" />Cargando...
         </p>
         <div id="tabulator" ref="tableRef" v-else class="mt-5"></div>
+
       </div>
     </div>
     <!-- END: HTML Table Data -->
@@ -275,7 +277,7 @@ const reInitOnResizeWindow = () => {
     <Dialog :open="setDeleteModalPreview" @close="() => {
       // setDeleteModalPreview.value = false;
     }
-      " :initialFocus="deleteButtonRef">
+    " :initialFocus="deleteButtonRef">
       <Dialog.Panel>
         <div class="p-5 text-center">
           <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
@@ -290,21 +292,21 @@ const reInitOnResizeWindow = () => {
             Cancelar
           </Button>
           <Button type="button" variant="danger" class="w-24" ref="{deleteButtonRef}" @click="deleteUser()"
-            :disabled="store.isLoading">
-            {{ store.isLoading ? 'Cargando...' : 'Eliminar' }}
+            :disabled="isLoading">
+            <LoadingIcon color="white" v-if="isLoading" icon="tail-spin" class="mr-1" /> {{ isLoading ? '' : 'Eliminar' }}
           </Button>
         </div>
       </Dialog.Panel>
     </Dialog>
 
-    <Notification id="failed-notification-content" class="flex hidden">
+    <Notification id="delete-notification" class="flex hidden">
       <Lucide icon="CheckCircle" class="text-success" />
       <div class="ml-4 mr-4">
         <div class="font-medium">Exelente!</div>
-        <div class="mt-1 text-slate-500">Usuario eliminado exitosamente.</div>
+        <div class="mt-1 text-slate-500">Rol eliminado exitosamente.</div>
       </div>
     </Notification>
 
-    <CreatedOrUpdate :foo="headerFooterSlideoverPreview" />
+    <CreatedOrUpdate :foo="headerFooterSlideoverPreview" :data="editData" @refresh="onLoadData()" />
   </div>
 </template>

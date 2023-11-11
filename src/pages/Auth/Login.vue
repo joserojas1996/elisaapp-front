@@ -15,6 +15,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useVuelidate } from "@vuelidate/core";
 import { email, required, minLength } from "@vuelidate/validators";
+import LoadingIcon from "../../base-components/LoadingIcon";
 
 const router = useRouter();
 const store = authStore();
@@ -197,8 +198,8 @@ const handleSubmit = async () => {
                   variant="primary"
                   class="w-full px-4 py-3 align-top xl:w-32 xl:mr-3"
                   type="submit"
-                >
-                {{ store.isLoading ? "Cargando..." : "Iniciar Sesión" }}
+                  :disabled="store.isLoading"
+                > <LoadingIcon color="white" v-if="store.isLoading" icon="tail-spin" class="mr-1" /> {{ store.isLoading ? "" : "Iniciar Sesión" }}
                 </Button>
                 <router-link
                   class="transition duration-200 border shadow-sm inline-flex items-center justify-center rounded-md font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed dark:border-primary w-full px-4 py-3 align-top xl:w-32 xl:mr-3 outline-secondary w-full px-4 py-3 mt-3 align-top xl:w-32 xl:mt-0"

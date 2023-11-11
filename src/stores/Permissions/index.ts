@@ -34,7 +34,6 @@ export const permissionsStore = defineStore('permissions', {
       try {
         await ServiceApi.getCookie();
         const response = await ServiceApi.get("api/admin/permissions");
-        console.log(response)
         this.permissions = response.data
         return response;
       } catch (err) {

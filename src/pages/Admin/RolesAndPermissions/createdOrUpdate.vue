@@ -11,9 +11,16 @@ import { required, minLength } from "@vuelidate/validators";
 import Toastify from "toastify-js";
 import Notification from "../../../base-components/Notification";
 import { rolesStore } from "../../../stores/Roles/index";
+import LoadingIcon from "../../../base-components/LoadingIcon"
 
+interface PermissionsInterfase {
+    id: string,
+    name: string,
+    label: string,
+}
 
 const formData = reactive({
+    id: '',
     name: '',
     label: '',
     permissions: '',
@@ -21,8 +28,20 @@ const formData = reactive({
 
 const headerFooterSlideoverPreview = ref(false);
 const store = permissionsStore();
-const props = defineProps(['foo'])
+const props = defineProps({
+    'foo': {
+        type: Boolean,
+        required: false
+    },
+    'data': {
+        type: Object,
+        default: {}
+    }
+})
 const formRef = ref();
+const isLoading = ref(false);
+const emit = defineEmits(['refresh'])
+
 
 onMounted(async () => {
     await permissionsStore().index()
@@ -30,9 +49,19 @@ onMounted(async () => {
 
 watch(props, (newValue, oldValue) => {
     onEdit()
+    if (props.data?.id) {
+        const { id, name, label, permissions } = props.data
+        formData.id = id
+        formData.name = name
+        formData.label = label
+        formData.permissions = permissions.map((obj: PermissionsInterfase) => obj.name)
+    }
 })
 
+
+
 const onEdit = () => {
+    reset()
     headerFooterSlideoverPreview.value = !headerFooterSlideoverPreview.value
 };
 
@@ -54,11 +83,12 @@ const saveFormData = async () => {
     }
 
     try {
+        isLoading.value = true
         const response: any = await rolesStore().store(formData);
         if (response?.status == 201) {
 
             const failedEl = document
-                .querySelectorAll("#failed-notification-content")[0]
+                .querySelectorAll("#add-rol-notification")[0]
                 .cloneNode(true) as HTMLElement;
             failedEl.classList.remove("hidden");
             Toastify({
@@ -70,11 +100,13 @@ const saveFormData = async () => {
                 position: "right",
                 stopOnFocus: true,
             }).showToast();
-
+            emit('refresh');
             headerFooterSlideoverPreview.value = false
         }
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoading.value = false
     }
 };
 
@@ -87,9 +119,14 @@ const toSlug = async () => {
     } else {
         formData.name = ''
     }
-
 };
 
+const reset = () => {
+    formData.id = ''
+    formData.name = ''
+    formData.label = ''
+    formData.permissions = ''
+};
 
 </script>
 <template>
@@ -146,17 +183,18 @@ const toSlug = async () => {
                         <div class="mt-3">
                             <FormLabel> Permisos </FormLabel>
                             <div>
-                                <TomSelect v-model.trim="v$.permissions.$model" @blur="v$.permissions.$touch" :options="{
-                                    placeholder: 'Seleccionar',
-                                    plugins: {
-                                        'checkbox_options': {
-                                            'checkedClassNames': ['ts-checked'],
-                                            'uncheckedClassNames': ['ts-unchecked'],
+                                <TomSelect :value="formData.permissions" v-model.trim="v$.permissions.$model"
+                                    @blur="v$.permissions.$touch" :options="{
+                                        placeholder: 'Seleccionar',
+                                        plugins: {
+                                            'checkbox_options': {
+                                                'checkedClassNames': ['ts-checked'],
+                                                'uncheckedClassNames': ['ts-unchecked'],
+                                            },
                                         },
-                                    },
-                                }" multiple :class="{ 'border-danger': v$.permissions.$error }">
-                                    <option :value="value.name" v-for="value in store.getPermissions.data">{{ value.label }}
-                                    </option>
+                                    }" multiple :class="{ 'border-danger': v$.permissions.$error }">
+                                    <option :value="value.name" v-for="value in store.getPermissions.data"
+                                        :key="value.name">{{ value.label }}</option>
                                 </TomSelect>
                                 <template v-if="v$.permissions.$error">
                                     <div v-for="(error, index) in v$.permissions.$errors" :key="index"
@@ -177,21 +215,22 @@ const toSlug = async () => {
                 <!-- END: Slide Over Body -->
                 <!-- BEGIN: Slide Over Footer -->
                 <Slideover.Footer>
-                    <Button variant="outline-secondary" type="button" @click=" headerFooterSlideoverPreview = false"
+                    <Button variant="outline-secondary" type="button" @click="headerFooterSlideoverPreview = false"
                         class="w-20 mr-2">
                         Cancelar
                     </Button>
-                    <Button variant="primary" type="submit" class="w-20" @click="saveFormData()">
-                        {{ store.isLoading ? "Cargando..." : "Guardar" }}
+                    <Button variant="primary" type="submit" class="w-20" @click="saveFormData()" :disabled="isLoading">
+                        <LoadingIcon color="white" v-if="isLoading" icon="tail-spin" class="mr-1" />{{ isLoading ? "" :
+                            "Guardar" }}
                     </Button>
                 </Slideover.Footer>
             </Slideover.Panel>
             <!-- END: Slide Over Footer -->
-            <Notification id="failed-notification-content" class="flex hidden">
+            <Notification id="add-rol-notification" class="flex hidden">
                 <Lucide icon="CheckCircle" class="text-success" />
                 <div class="ml-4 mr-4">
                     <div class="font-medium">Exelente!</div>
-                    <div class="mt-1 text-slate-500">Nuevo rol agregado.</div>
+                    <div class="mt-1 text-slate-500">Rol agregado exitosamente.</div>
                 </div>
             </Notification>
         </Slideover>

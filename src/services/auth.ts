@@ -52,7 +52,7 @@ class ServiceApi {
     return client({
       method: "PUT",
       url: path,
-      data: JSON.stringify(data),
+      data: data,
     });
   }
 }

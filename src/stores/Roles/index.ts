@@ -29,14 +29,13 @@ export const rolesStore = defineStore('roles', {
   actions: {
 
     async index(payload: ParamsSearch) {
-      this.loading = true
       try {
+        this.loading = true
         await ServiceApi.getCookie();
         const response = await ServiceApi.get("api/admin/roles", payload);
         this.roles = response.data
         return response;
       } catch (err) {
-        this.loading = false
         console.log("loginErr", err);
         return err;
       } finally {
@@ -45,47 +44,33 @@ export const rolesStore = defineStore('roles', {
     },
 
     async store(payload: any) {
-      this.loading = true
       try {
-        await ServiceApi.getCookie();
-        const response = await ServiceApi.post("api/admin/roles", payload);
-        return response;
+        const { id } = payload
+        if (!id) {
+          await ServiceApi.getCookie();
+          const response = await ServiceApi.post("api/admin/roles", payload);
+          return response;
+        } else {
+          await ServiceApi.getCookie();
+          const response = await ServiceApi.put(`api/admin/role/${id}`, payload);
+          return response;
+        }
       } catch (err) {
-        this.loading = false
         console.log("loginErr", err);
         return err;
       } finally {
-        this.loading = false
-      }
-    },
-
-    async update(payload: any) {
-      this.loading = true
-      try { 
-        await ServiceApi.getCookie();
-        const response = await ServiceApi.put(`api/admin/role/${payload.id}`, payload);
-        return response;
-      } catch (err) {
-        this.loading = false
-        console.log("loginErr", err);
-        return err;
-      } finally {
-        this.loading = false
       }
     },
 
     async delete(payload: any) {
-      this.loading = true
-      try { 
+      try {
         await ServiceApi.getCookie();
         const response = await ServiceApi.delete(`api/admin/role/${payload.id}`, payload);
         return response;
       } catch (err) {
-        this.loading = false
         console.log("loginErr", err);
         return err;
       } finally {
-        this.loading = false
       }
     },
   },
