@@ -60,5 +60,6 @@ const localValue = computed({
     :type="props.type"
     v-bind="_.omit(attrs, 'class')"
     v-model="localValue"
+    autocomplete="false"
   />
 </template>

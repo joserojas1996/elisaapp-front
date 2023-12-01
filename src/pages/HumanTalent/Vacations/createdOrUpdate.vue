@@ -8,27 +8,28 @@ import Button from "../../../base-components/Button";
 import { permissionsStore } from "../../../stores/Permissions";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
+import Toastify from "toastify-js";
+import Notification from "../../../base-components/Notification";
 import { rolesStore } from "../../../stores/Roles/index";
 import LoadingIcon from "../../../base-components/LoadingIcon"
-import { core } from "../../../services/pluginInit";
 
 interface PermissionsInterfase {
-    id: string,
+    id: any,
     name: string,
     label: string,
 }
 
 const formData = reactive({
-    id: '',
+    id: null,
     name: '',
     label: '',
     permissions: '',
 });
 
 const headerFooterSlideoverPreview = ref(false);
-const store = permissionsStore();
+const store = rolesStore();
 const props = defineProps({
-    'foo': {
+    'open': {
         type: Boolean,
         required: false
     },
@@ -39,26 +40,29 @@ const props = defineProps({
 })
 const formRef = ref();
 const isLoading = ref(false);
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'close'])
+
 
 onMounted(async () => {
-    await permissionsStore().index()
+    await store.index()
 });
 
 watch(props, (newValue, oldValue) => {
-    onEdit()
+
     if (props.data?.id) {
         const { id, name, label, permissions } = props.data
         formData.id = id
         formData.name = name
         formData.label = label
         formData.permissions = permissions.map((obj: PermissionsInterfase) => obj.name)
+    } else {
+        reset()
     }
 })
 
-const onEdit = () => {
-    reset()
-    headerFooterSlideoverPreview.value = !headerFooterSlideoverPreview.value
+const closeForm = () => {
+    headerFooterSlideoverPreview.value = false
+    emit('close');
 };
 
 const rules = computed(() => {
@@ -66,6 +70,7 @@ const rules = computed(() => {
         name: { required, minLength: minLength(3) },
         label: { required, minLength: minLength(3) },
         permissions: { required, minLength: minLength(1) },
+
     }
 });
 
@@ -80,11 +85,23 @@ const saveFormData = async () => {
     try {
         isLoading.value = true
         const response: any = await rolesStore().store(formData);
-        console.log(response)
         if (response?.status == 201) {
-            core.showSnackbar("success", response.data.message);
+
+            const failedEl = document
+                .querySelectorAll("#add-rol-notification")[0]
+                .cloneNode(true) as HTMLElement;
+            failedEl.classList.remove("hidden");
+            Toastify({
+                node: failedEl,
+                duration: 3000,
+                newWindow: true,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+            }).showToast();
             emit('refresh');
-            headerFooterSlideoverPreview.value = false
+            closeForm()
         }
     } catch (error) {
         console.log(error);
@@ -105,7 +122,7 @@ const toSlug = async () => {
 };
 
 const reset = () => {
-    formData.id = ''
+    formData.id = null
     formData.name = ''
     formData.label = ''
     formData.permissions = ''
@@ -114,57 +131,23 @@ const reset = () => {
 </script>
 <template>
     <form class="validate-form" @submit.prevent="saveFormData" :model="formData" ref="formRef">
-        <Slideover backdrop="static" :open="headerFooterSlideoverPreview" @close="() => { }">
+        <Slideover backdrop="static" :open="$props.open" @close="() => { }">
             <!-- BEGIN: Slide Over Header -->
             <Slideover.Panel>
-                <a @click="headerFooterSlideoverPreview = false" class="absolute top-0 left-0 right-auto mt-4 -ml-12"
-                    href="#">
+                <a @click="emit('close')" class="absolute top-0 left-0 right-auto mt-4 -ml-12" href="#">
                     <Lucide icon="X" class="w-8 h-8 text-slate-400" />
                 </a>
                 <Slideover.Title>
                     <h2 class="mr-auto text-base font-medium">
-                        Agregar nuevo Rol
+                        {{ formData.id ? 'Actualizar usuario' : 'Agregar nuevo usuario' }}
                     </h2>
                 </Slideover.Title>
                 <!-- END: Slide Over Header -->
                 <!-- BEGIN: Slide Over Body -->
                 <Slideover.Description>
                     <div>
-                        <div>
-                            <FormLabel htmlFor="modal-form-1">Nombres</FormLabel>
-                            <FormInput id="modal-form-1" type="text" placeholder="Ingrese un nombre" :class="{
-                                'border-danger': v$.label.$error,
-                            }" v-model.trim="v$.label.$model" @blur="v$.label.$touch" @keyup="toSlug()" />
-                            <template v-if="v$.label.$error">
-                                <div v-for="(error, index) in v$.label.$errors" :key="index" class="mt-1 text-danger">
-                                    <span v-if="error.$validator == 'required'" class="error">
-                                        El nombre es requerido
-                                    </span>
-                                    <span v-if="error.$validator == 'minLength'" class="error">
-                                        El nombre debe contener al menos 3 caracteres
-                                    </span>
-                                </div>
-                            </template>
-
-                        </div>
                         <div class="mt-3">
-                            <FormLabel htmlFor="modal-form-2">Slug</FormLabel>
-                            <FormInput id="modal-form-2" type="text" placeholder="Ingrese un slug" :class="{
-                                'border-danger': v$.name.$error,
-                            }" v-model.trim="v$.name.$model" @blur="v$.name.$touch" />
-                            <template v-if="v$.name.$error">
-                                <div v-for="(error, index) in v$.name.$errors" :key="index" class="mt-1 text-danger">
-                                    <span v-if="error.$validator == 'required'" class="error">
-                                        El Slug es requerido
-                                    </span>
-                                    <span v-if="error.$validator == 'minLength'" class="error">
-                                        El Slug debe contener al menos 3 caracteres
-                                    </span>
-                                </div>
-                            </template>
-                        </div>
-                        <div class="mt-3">
-                            <FormLabel> Permisos </FormLabel>
+                            <FormLabel> Empleado </FormLabel>
                             <div>
                                 <TomSelect :value="formData.permissions" v-model.trim="v$.permissions.$model"
                                     @blur="v$.permissions.$touch" :options="{
@@ -176,7 +159,38 @@ const reset = () => {
                                             },
                                         },
                                     }" multiple :class="{ 'border-danger': v$.permissions.$error }">
-                                    <option :value="value.name" v-for="value in store.getPermissions.data"
+                                    <option :value="value.name" v-for="value in store.getRoles.data"
+                                        :key="value.name">{{ value.label }}</option>
+                                </TomSelect>
+                                <template v-if="v$.permissions.$error">
+                                    <div v-for="(error, index) in v$.permissions.$errors" :key="index"
+                                        class="mt-1 text-danger">
+                                        <span v-if="error.$validator == 'required'" class="error">
+                                            Los permisos son requeridos
+                                        </span>
+                                        <span v-if="error.$validator == 'minLength'" class="error">
+                                            Debe seleccionar al menos 1 permiso
+                                        </span>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <FormLabel> Roles </FormLabel>
+                            <div>
+                                <TomSelect :value="formData.permissions" v-model.trim="v$.permissions.$model"
+                                    @blur="v$.permissions.$touch" :options="{
+                                        placeholder: 'Seleccionar',
+                                        plugins: {
+                                            'checkbox_options': {
+                                                'checkedClassNames': ['ts-checked'],
+                                                'uncheckedClassNames': ['ts-unchecked'],
+                                            },
+                                        },
+                                    }" multiple :class="{ 'border-danger': v$.permissions.$error }">
+                                    <option :value="value.name" v-for="value in store.getRoles.data"
                                         :key="value.name">{{ value.label }}</option>
                                 </TomSelect>
                                 <template v-if="v$.permissions.$error">
@@ -198,8 +212,7 @@ const reset = () => {
                 <!-- END: Slide Over Body -->
                 <!-- BEGIN: Slide Over Footer -->
                 <Slideover.Footer>
-                    <Button variant="outline-secondary" type="button" @click="headerFooterSlideoverPreview = false"
-                        class="w-20 mr-2">
+                    <Button variant="outline-secondary" type="button" @click="emit('close')" class="w-20 mr-2">
                         Cancelar
                     </Button>
                     <Button variant="primary" type="submit" class="w-20" @click="saveFormData()" :disabled="isLoading">
@@ -209,6 +222,13 @@ const reset = () => {
                 </Slideover.Footer>
             </Slideover.Panel>
             <!-- END: Slide Over Footer -->
+            <Notification id="add-rol-notification" class="flex hidden">
+                <Lucide icon="CheckCircle" class="text-success" />
+                <div class="ml-4 mr-4">
+                    <div class="font-medium">Exelente!</div>
+                    <div class="mt-1 text-slate-500">Rol agregado exitosamente.</div>
+                </div>
+            </Notification>
         </Slideover>
     </form>
 </template>

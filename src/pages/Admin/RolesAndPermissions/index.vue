@@ -8,12 +8,9 @@ import { onMounted, ref, reactive } from "vue";
 import { createIcons, icons } from "lucide";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { stringToHTML } from "../../../utils/helper";
-import Toastify from "toastify-js";
-import Notification from "../../../base-components/Notification";
 import { rolesStore } from "../../../stores/Roles/index";
 import CreatedOrUpdate from './createdOrUpdate.vue'
-import Pagination from "../../../base-components/Pagination";
-
+import { core } from "../../../services/pluginInit";
 
 interface Response {
   name?: string;
@@ -75,20 +72,7 @@ const deleteUser = async () => {
   const response: any = await rolesStore().delete(deleteData.value);
 
   if (response?.status == 200) {
-    const failedEl = document
-      .querySelectorAll("#delete-notification")[0]
-      .cloneNode(true) as HTMLElement;
-    failedEl.classList.remove("hidden");
-    Toastify({
-      node: failedEl,
-      duration: 3000,
-      newWindow: true,
-      close: true,
-      gravity: "top",
-      position: "right",
-      stopOnFocus: true,
-    }).showToast();
-
+    core.showSnackbar("success", response.data.message);
     setDeleteModalPreview.value = !setDeleteModalPreview.value
     onLoadData();
   }
@@ -106,7 +90,6 @@ const initTabulator = () => {
       paginationInitialPage: 1,
       paginationSize: 10,
       paginationSizeSelector: [10, 20, 30, 40],
-      paginationCounter:"rows",
       placeholder: "No se han encontrado registros",
       columns: [
         {
@@ -298,14 +281,6 @@ const reInitOnResizeWindow = () => {
         </div>
       </Dialog.Panel>
     </Dialog>
-
-    <Notification id="delete-notification" class="flex hidden">
-      <Lucide icon="CheckCircle" class="text-success" />
-      <div class="ml-4 mr-4">
-        <div class="font-medium">Exelente!</div>
-        <div class="mt-1 text-slate-500">Rol eliminado exitosamente.</div>
-      </div>
-    </Notification>
 
     <CreatedOrUpdate :foo="headerFooterSlideoverPreview" :data="editData" @refresh="onLoadData()" />
   </div>

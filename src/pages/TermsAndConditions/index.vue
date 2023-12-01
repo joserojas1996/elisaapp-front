@@ -2,6 +2,14 @@
 import Button from "../../base-components/Button";
 import logoUrl from "../../assets/images/logo.png";
 import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
+import { computed } from "vue";
+
+const nowDate = new Date().toLocaleDateString("es-ES", {
+  day: "numeric",
+  month: "numeric",
+  year: "numeric"
+});
+
 
 </script>
 
@@ -55,7 +63,7 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
 
             <article class="mt-10">
               <span class="float-right">
-                <b>Fecha de entrada en vigencia: 15/10/2023 </b></span><br />
+                <b>Fecha de entrada en vigencia: {{ nowDate }}</b></span><br />
               <div class="mt-16">
                 <h1 class="text-2xl font-medium leading-none">
                   Bienvenido a Elisa System.
@@ -108,7 +116,8 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
                   sistema. <br />
                   2.2. La firma con el hash del usuario tendrá validez legal y
                   será considerada como una forma válida de consentimiento y
-                  autorización.
+                  autorización.<br>
+                  2.3. Por definir
                 </p>
               </div>
             </article>
@@ -127,6 +136,8 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
                   3.2. El acceso a las cuentas de usuario se llevará a cabo
                   siguiendo los protocolos de seguridad y confidencialidad
                   establecidos.
+                  <br>
+                  3.3. Por definir
                 </p>
               </div>
             </article>
@@ -145,6 +156,8 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
                   4.2. El usuario será notificado en caso de bloqueo y se le
                   proporcionará información sobre los pasos a seguir para
                   resolver la situación.
+                  <br>
+                  4.3. Por definir
                 </p>
               </div>
             </article>
@@ -152,19 +165,47 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
             <article class="mt-10" id="4">
               <div>
                 <h1 class="text-2xl font-medium leading-none">
-                  Administración de Recursos Humanos y bienes nacionales
+                  Administración de Recursos Humanos.
                 </h1>
                 <br />
                 <p class="font-normal">
-                  5.1. Elisa System es una plataforma destinada a la
-                  administración eficiente de recursos humanos y minerales,
-                  incluyendo pero no limitado a la gestión de personal,
-                  asignación de tareas, control de inventario, entre otras
-                  funcionalidades. <br />
+                  5.1. Por definir <br />
+                </p>
+              </div>
+            </article>
 
-                  5.2. El usuario se compromete a utilizar Elisa System
-                  exclusivamente para los fines previstos y dentro de los
-                  límites establecidos por la administración.
+            <article class="mt-10" id="4">
+              <div>
+                <h1 class="text-2xl font-medium leading-none">
+                  Administración de Bienes nacionales.
+                </h1>
+                <br />
+                <p class="font-normal">
+                  6.1. Por definir <br />
+                </p>
+              </div>
+            </article>
+
+            <article class="mt-10" id="4">
+              <div>
+                <h1 class="text-2xl font-medium leading-none">
+                  Administración de tesoresia
+                </h1>
+                <br />
+                <p class="font-normal">
+                  7.1. Por definir <br />
+                </p>
+              </div>
+            </article>
+
+            <article class="mt-10" id="4">
+              <div>
+                <h1 class="text-2xl font-medium leading-none">
+                  Administración de comercializacion
+                </h1>
+                <br />
+                <p class="font-normal">
+                  8.1. Por definir <br />
                 </p>
               </div>
             </article>
@@ -176,12 +217,14 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
                 </h1>
                 <br />
                 <p class="font-normal">
-                  6.1. Los datos recopilados y almacenados por Elisa System
+                  9.1. Los datos recopilados y almacenados por Elisa System
                   estarán protegidos de acuerdo con las leyes y regulaciones de
                   privacidad aplicables. <br />
-                  6.2. La información proporcionada por los usuarios será
+                  9.2. La información proporcionada por los usuarios será
                   tratada con estricta confidencialidad y solo se utilizará con
                   el propósito de mejorar la experiencia de uso.
+                  <br>
+                  9.3. Por definir
                 </p>
               </div>
             </article>
@@ -193,10 +236,12 @@ import undraw_terms_re_6ak4 from "../../assets/images/undraw_terms_re_6ak4.svg";
                 </h1>
                 <br />
                 <p class="font-normal">
-                  7.1. La administración de Elisa System se reserva el derecho
+                  10.1. La administración de Elisa System se reserva el derecho
                   de modificar estos términos y condiciones en cualquier
                   momento. Los cambios serán notificados a los usuarios y
-                  entrarán en vigencia a partir de su publicación.
+                  entrarán en vigencia a partir de su publicación. <br>
+                  10.2. Por definir
+
                 </p>
               </div>
             </article>

@@ -80,9 +80,41 @@ export const useSideMenuStore = defineStore("sideMenu", {
           },
         ],
       },
+      {
+        icon: "Users",
+        pageName: "side-menu-dashboard",
+        title: "Talento Humano",
+        subMenu: [
+          {
+            icon: "Minus",
+            pageName: "charges",
+            title: "Cargos",
+          },
+          {
+             icon: "Minus",
+             pageName: "departaments",
+             title: "Departamentos",
+           },
+          {
+            icon: "Minus",
+            pageName: "employees",
+            title: "Empleados",
+          },
+          {
+            icon: "Minus",
+            pageName: "paysheets",
+            title: "Nominas",
+          },
+          {
+            icon: "Minus",
+            pageName: "vacations",
+            title: "Vacaciones",
+          },
+        ],
+      },
 
       {
-        icon: "Home",
+        icon: "Settings",
         pageName: "side-menu-dashboard",
         title: "Mantenedores",
         subMenu: [

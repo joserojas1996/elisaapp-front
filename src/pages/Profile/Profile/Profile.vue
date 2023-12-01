@@ -72,7 +72,7 @@ const nextNewAuthors = () => {
             </Menu.Button>
             <Menu.Items class="w-40">
               <Menu.Item>
-                <Lucide icon="MoveDown" class="w-4 h-4 mr-2" /> Descargar
+                <Lucide icon="Download" class="w-4 h-4 mr-2" /> Descargar
               </Menu.Item>
               <Menu.Item>
                 <Lucide icon="Trash" class="w-4 h-4 mr-2" />
@@ -93,7 +93,7 @@ const nextNewAuthors = () => {
             </Menu.Button>
             <Menu.Items class="w-40">
               <Menu.Item>
-                <Lucide icon="MoveDown" class="w-4 h-4 mr-2" /> Descargar
+                <Lucide icon="Download" class="w-4 h-4 mr-2" /> Descargar
               </Menu.Item>
               <Menu.Item>
                 <Lucide icon="Trash" class="w-4 h-4 mr-2" />
@@ -114,7 +114,7 @@ const nextNewAuthors = () => {
             </Menu.Button>
             <Menu.Items class="w-40">
               <Menu.Item>
-                <Lucide icon="Move-Down" class="w-4 h-4 mr-2" /> Descargar
+                <Lucide icon="Download" class="w-4 h-4 mr-2" /> Descargar
               </Menu.Item>
               <Menu.Item>
                 <Lucide icon="Trash" class="w-4 h-4 mr-2" />

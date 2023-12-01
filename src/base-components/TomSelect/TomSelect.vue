@@ -10,7 +10,7 @@ export interface TomSelectElement extends HTMLSelectElement {
 }
 
 export interface TomSelectProps extends /* @vue-ignore */ SelectHTMLAttributes {
-  modelValue: string | string[];
+  modelValue: string | string[] ;
   options?: RecursivePartial<TomSettings>;
   refKey?: string;
 }
@@ -22,7 +22,9 @@ export interface TomSelectEmit {
 
 export type ProvideTomSelect = (el: TomSelectElement) => void;
 
-const props = withDefaults(defineProps<TomSelectProps>(), {});
+const props = withDefaults(defineProps<TomSelectProps>(), {
+  modelValue: undefined,
+});
 
 const emit = defineEmits<TomSelectEmit>();
 
@@ -71,7 +73,7 @@ const vSelectDirective = {
 
     // Clone the select element to prevent tom select remove the original element
     const clonedEl = el.cloneNode(true) as TomSelectElement;
-
+    clonedEl.value = "";
     // Save initial classnames
     const classNames = el?.getAttribute("class");
     classNames && clonedEl.setAttribute("data-initial-class", classNames);

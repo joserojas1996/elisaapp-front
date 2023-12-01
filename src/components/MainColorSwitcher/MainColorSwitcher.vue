@@ -23,15 +23,12 @@ setColorSchemeClass();
 <template>
   <!-- BEGIN: Main Color Switcher -->
   <div
-    class="fixed bottom-0 right-0 z-50 flex items-center justify-center h-12 px-5 mb-10 border rounded-full shadow-md box mr-52"
+    class="fixed bottom-0 right-12 z-50 flex items-center justify-center h-7 px-5 mb-10 border rounded-full shadow-md box mr-20 "
   >
-    <div class="hidden mr-4 sm:block text-slate-600 dark:text-slate-200">
-      Color Scheme
-    </div>
     <a
       @click="switchColorScheme('default')"
       :class="[
-        'block w-8 h-8 cursor-pointer bg-blue-800 rounded-full border-4 mr-1 hover:border-slate-200',
+        'block w-4 h-4 cursor-pointer bg-blue-800 rounded-full border-2 mr-1 hover:border-slate-200',
         {
           'border-slate-300 dark:border-darkmode-800/80':
             colorScheme == 'default',
@@ -42,7 +39,7 @@ setColorSchemeClass();
     <a
       @click="switchColorScheme('theme-1')"
       :class="[
-        'block w-8 h-8 cursor-pointer bg-emerald-900 rounded-full border-4 mr-1 hover:border-slate-200',
+        'block w-4 h-4 cursor-pointer bg-emerald-900 rounded-full border-2 mr-1 hover:border-slate-200',
         {
           'border-slate-300 dark:border-darkmode-800/80':
             colorScheme == 'theme-1',
@@ -53,7 +50,7 @@ setColorSchemeClass();
     <a
       @click="switchColorScheme('theme-2')"
       :class="[
-        'block w-8 h-8 cursor-pointer bg-blue-900 rounded-full border-4 mr-1 hover:border-slate-200',
+        'block w-4 h-4 cursor-pointer bg-blue-900 rounded-full border-2 mr-1 hover:border-slate-200',
         {
           'border-slate-300 dark:border-darkmode-800/80':
             colorScheme == 'theme-2',
@@ -64,7 +61,7 @@ setColorSchemeClass();
     <a
       @click="switchColorScheme('theme-3')"
       :class="[
-        'block w-8 h-8 cursor-pointer bg-cyan-900 rounded-full border-4 mr-1 hover:border-slate-200',
+        'block w-4 h-4 cursor-pointer bg-cyan-900 rounded-full border-2 mr-1 hover:border-slate-200',
         {
           'border-slate-300 dark:border-darkmode-800/80':
             colorScheme == 'theme-3',
@@ -75,7 +72,7 @@ setColorSchemeClass();
     <a
       @click="switchColorScheme('theme-4')"
       :class="[
-        'block w-8 h-8 cursor-pointer bg-indigo-900 rounded-full border-4 hover:border-slate-200',
+        'block w-4 h-4 cursor-pointer bg-indigo-900 rounded-full border-2 hover:border-slate-200',
         {
           'border-slate-300 dark:border-darkmode-800/80':
             colorScheme == 'theme-4',

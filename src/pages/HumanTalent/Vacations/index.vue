@@ -15,7 +15,6 @@ import { usersStore } from "../../../stores/Users/index";
 import CreatedOrUpdate from './createdOrUpdate.vue'
 import TomSelect from "../../../base-components/TomSelect"
 import { rolesStore } from "../../../stores/Roles";
-import { core } from "../../../services/pluginInit";
 
 
 interface Response {
@@ -44,11 +43,11 @@ const filter = reactive({
 
 onMounted(async () => {
   onLoadData()
-  await rolesStore().index()
 });
 
 const onLoadData = async () => {
   await store.index(filter)
+  await rolesStore().index()
   initTabulator();
   reInitOnResizeWindow();
 };
@@ -72,10 +71,25 @@ const deleteUser = async () => {
   const response: any = await usersStore().delete(deleteData.value);
 
   if (response?.status == 200) {
-    core.showSnackbar("success", 'Usuario eliminado exitosamente');
+
+    const failedEl = document
+      .querySelectorAll("#failed-notification-content")[0]
+      .cloneNode(true) as HTMLElement;
+    failedEl.classList.remove("hidden");
+    Toastify({
+      node: failedEl,
+      duration: 3000,
+      newWindow: true,
+      close: true,
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
+    }).showToast();
     setDeleteModalPreview.value = !setDeleteModalPreview.value
-    onLoadData()
+
+    await usersStore().index(filter);
   }
+
 };
 
 
@@ -114,7 +128,7 @@ const initTabulator = () => {
           formatter(cell) {
             const response: any = cell.getData();
             return `<div>
-                <div class="font-medium whitespace-nowrap">${response.username ?? ''}</div>
+                <div class="font-medium whitespace-nowrap">${response.username}</div>
                 <div class="text-xs text-slate-500 whitespace-nowrap">${response.correlative}</div>
               </div>`;
           },
@@ -153,7 +167,7 @@ const initTabulator = () => {
             const response: any = cell.getData();
             return `<div class="flex items-center lg:justify-center ${response.isActive ? "text-success" : "text-danger"
               }">
-                <i data-lucide="${response.isActive ? "check-square" : "x-square"}" class="w-4 h-4 mr-2"></i> ${response.isActive ? "Activo" : "Sin registro"
+                <i data-lucide="${response.isActive ? "check-square" : "x-square"}" class="w-4 h-4 mr-2"></i> ${response.isActive ? "Activo" : "Inactivo"
               }
               </div>`;
           },
@@ -244,10 +258,10 @@ const reInitOnResizeWindow = () => {
 <template>
   <div>
     <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
-      <h2 class="mr-auto text-lg font-medium">Gestion de usuarios</h2>
+      <h2 class="mr-auto text-lg font-medium">Gestion de cargos</h2>
       <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
         <Button variant="primary" class="mr-2 shadow-md" @click="openModal = !openModal">
-          Nuevo usuario
+          <Lucide icon="Plus" class="w-4 h-4 mr-2" /> Agregar
         </Button>
       </div>
     </div>
@@ -320,6 +334,14 @@ const reInitOnResizeWindow = () => {
         </div>
       </Dialog.Panel>
     </Dialog>
+
+    <Notification id="failed-notification-content" class="flex hidden">
+      <Lucide icon="CheckCircle" class="text-success" />
+      <div class="ml-4 mr-4">
+        <div class="font-medium">Exelente!</div>
+        <div class="mt-1 text-slate-500">Usuario eliminado exitosamente.</div>
+      </div>
+    </Notification>
 
     <CreatedOrUpdate :open="openModal" :data="editData" @close="closeForm()"
       @refresh="onLoadData()" />

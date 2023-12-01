@@ -2,27 +2,27 @@ import { defineStore } from "pinia";
 import { ServiceApi } from "../../services/auth";
 
 interface ParamsSearch {
-  search: any,
-  status: any,
-  page: any,
-  per_page: any,
+  search?: any,
+  status?: any,
+  page?: any,
+  per_page?: any,
 }
 
 interface stateInterfase {
-  roles: any,
+  departaments: any,
   loading: boolean,
   error: any,
 }
 
-export const rolesStore = defineStore('roles', {
+export const departamentsStore = defineStore('departaments', {
   state: (): stateInterfase => ({
-    roles: null,
-    loading: false,
+    departaments: null,
+    loading: true,
     error: null,
   }),
 
   getters: {
-    getRoles: (state) => state.roles,
+    getDepartaments: (state) => state.departaments,
     isLoading: (state) => state.loading,
   },
 
@@ -31,12 +31,12 @@ export const rolesStore = defineStore('roles', {
     async index(payload?: ParamsSearch) {
       try {
         this.loading = true
-        await ServiceApi.getCookie();
-        const response = await ServiceApi.get("api/admin/roles", payload);
-        this.roles = response.data
+        const response = await ServiceApi.get("api/rrhh/departaments", payload);
+        this.departaments = response.data
         return response;
       } catch (err) {
-        console.log("loginErr", err);
+        console.error("loginErr", err);
+        throw err
         return err;
       } finally {
         this.loading = false
@@ -44,33 +44,36 @@ export const rolesStore = defineStore('roles', {
     },
 
     async store(payload: any) {
+      this.loading = true
       try {
         const { id } = payload
         if (!id) {
-          await ServiceApi.getCookie();
-          const response = await ServiceApi.post("api/admin/roles", payload);
+          const response = await ServiceApi.post("api/rrhh/departaments", payload);
           return response;
         } else {
-          await ServiceApi.getCookie();
-          const response = await ServiceApi.put(`api/admin/role/${id}`, payload);
+          const response = await ServiceApi.put(`api/rrhh/departaments/${id}`, payload);
           return response;
         }
       } catch (err) {
-        console.log("loginErr", err);
+        console.error("loginErr", err);
+        throw err
         return err;
       } finally {
+        this.loading = false
       }
     },
 
     async delete(payload: any) {
+      this.loading = true
       try {
-        await ServiceApi.getCookie();
-        const response = await ServiceApi.delete(`api/admin/role/${payload.id}`, payload);
+        const response = await ServiceApi.delete(`api/rrhh/departaments/${payload.id}`, payload);
         return response;
       } catch (err) {
-        console.log("loginErr", err);
+        console.error("loginErr", err);
+        throw err
         return err;
       } finally {
+        this.loading = false
       }
     },
   },

@@ -45,7 +45,7 @@ export const usersStore = defineStore('users', {
       }
     },
 
-    async store(payload: ParamsSearch) {
+    async store(payload: any) {
       this.loading = true
       try {
         await ServiceApi.getCookie();

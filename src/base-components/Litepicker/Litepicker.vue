@@ -20,9 +20,13 @@ export interface LitepickerEmit {
 export interface LitepickerProps extends /* @vue-ignore */ InputHTMLAttributes {
   options: {
     format?: string | undefined;
-  } & LitepickerConfig;
+    setValue?: boolean;
+    placeholder?: string;
+  } & LitepickerConfig; 
   modelValue: string;
   refKey?: string;
+  setValue?: boolean;
+
 }
 
 export type ProvideLitepicker = (el: LitepickerElement) => void;
@@ -66,6 +70,7 @@ onMounted(() => {
 <template>
   <FormInput
     ref="litepickerRef"
+    placeholder="DD MM, YYYY"
     type="text"
     :value="props.modelValue"
     @change="(event: Event) => {

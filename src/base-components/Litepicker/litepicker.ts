@@ -26,7 +26,7 @@ const getDateFormat = (format: string | undefined) => {
 
 const setValue = (props: LitepickerProps, emit: LitepickerEmit) => {
   const format = getDateFormat(props.options.format);
-  if (!props.modelValue.length) {
+  if (!props.modelValue.length && props.setValue ) {
     let date = dayjs().format(format);
     date +=
       !props.options.singleMode && props.options.singleMode !== undefined

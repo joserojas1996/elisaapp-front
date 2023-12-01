@@ -1,31 +1,18 @@
 <script setup lang="ts">
 import Lucide from "../../../base-components/Lucide";
-import { Menu, Dialog, Slideover } from "../../../base-components/Headless";
+import { Dialog } from "../../../base-components/Headless";
 import Button from "../../../base-components/Button";
 import LoadingIcon from "../../../base-components/LoadingIcon"
 import { FormInput, FormSelect, FormLabel } from "../../../base-components/Form";
-import * as xlsx from "xlsx";
 import { onMounted, ref, reactive } from "vue";
 import { createIcons, icons } from "lucide";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { stringToHTML } from "../../../utils/helper";
-import Toastify from "toastify-js";
-import Notification from "../../../base-components/Notification";
-import { usersStore } from "../../../stores/Users/index";
 import CreatedOrUpdate from './createdOrUpdate.vue'
-import TomSelect from "../../../base-components/TomSelect"
-import { rolesStore } from "../../../stores/Roles";
+import { employeesStore } from "../../../stores/Employees";
 import { core } from "../../../services/pluginInit";
 
-
-interface Response {
-  name?: string;
-  category?: string;
-  images?: string[];
-  status?: string;
-}
-
-const store = usersStore();
+const store = employeesStore();
 const tableRef = ref<HTMLDivElement>();
 const tabulator = ref<Tabulator>();
 const openModal = ref(false);
@@ -36,15 +23,12 @@ const setDeleteModalPreview = ref(false);
 
 const filter = reactive({
   search: '',
-  active: '',
-  role: '',
   page: 1,
   per_page: 10,
 });
 
 onMounted(async () => {
   onLoadData()
-  await rolesStore().index()
 });
 
 const onLoadData = async () => {
@@ -69,20 +53,18 @@ const onDelete = (data: any) => {
 };
 
 const deleteUser = async () => {
-  const response: any = await usersStore().delete(deleteData.value);
-
+  const response: any = await store.delete(deleteData.value);
   if (response?.status == 200) {
-    core.showSnackbar("success", 'Usuario eliminado exitosamente');
+    core.showSnackbar("success", response.data.message);
     setDeleteModalPreview.value = !setDeleteModalPreview.value
     onLoadData()
   }
 };
 
-
 const initTabulator = () => {
   if (tableRef.value) {
     tabulator.value = new Tabulator(tableRef.value, {
-      data: store.usersList.data,
+      data: store.getEmployees.data,
       reactiveData: true,
       pagination: true,
       paginationMode: "local",
@@ -104,46 +86,57 @@ const initTabulator = () => {
 
         // For HTML table
         {
-          title: "NOMBRE DE USUARIO",
+          title: "IDENTIFICACIÓN",
           minWidth: 200,
-          responsive: 0,
-          field: "username",
+          field: "identit",
           vertAlign: "middle",
           print: false,
           download: false,
           formatter(cell) {
-            const response: any = cell.getData();
+            const {identity, correlative}: any = cell.getData();
             return `<div>
-                <div class="font-medium whitespace-nowrap">${response.username ?? ''}</div>
-                <div class="text-xs text-slate-500 whitespace-nowrap">${response.correlative}</div>
+                <div class="font-medium whitespace-nowrap">V-${identity}</div>
+                <div class="text-xs text-slate-500 whitespace-nowrap">${correlative}</div>
               </div>`;
           },
         },
         {
-          title: "NOMBRE",
+          title: "APELLIDOS Y NOMBRES",
           minWidth: 200,
-          field: "name",
-          hozAlign: "left",
-          headerHozAlign: "left",
+          responsive: 0,
+          field: "firstname",
           vertAlign: "middle",
           print: false,
           download: false,
+          formatter(cell) {
+            const {firstname, lastname}: any = cell.getData();
+            return `<div>
+                <p class="font-medium whitespace-nowrap">${lastname}</p>
+                <p class="text-xs text-slate-500 whitespace-nowrap">${firstname}</p>
+              </div>`;
+          },
         },
         {
-          title: "CORREO",
+          title: "DEPARTAMENTO",
           minWidth: 200,
-          field: "email",
+          field: "departament",
           hozAlign: "left",
           headerHozAlign: "left",
           vertAlign: "middle",
           print: false,
           download: false,
+          formatter(cell) {
+            const {departament, charge}: any = cell.getData();
+            return `<div>
+                <p class="font-medium whitespace-nowrap">${departament.name}</p>
+                <p class="text-xs text-slate-500 whitespace-nowrap">${charge.name}</p>
+              </div>`;
+          },
         },
-
         {
           title: "ESTADO",
           minWidth: 200,
-          field: "isActive",
+          field: "status",
           hozAlign: "center",
           headerHozAlign: "center",
           vertAlign: "middle",
@@ -151,27 +144,42 @@ const initTabulator = () => {
           download: false,
           formatter(cell) {
             const response: any = cell.getData();
-            return `<div class="flex items-center lg:justify-center ${response.isActive ? "text-success" : "text-danger"
+            return `<div class="flex items-center lg:justify-center ${response.status ? "text-success" : "text-danger"
               }">
-                <i data-lucide="${response.isActive ? "check-square" : "x-square"}" class="w-4 h-4 mr-2"></i> ${response.isActive ? "Activo" : "Sin registro"
+                <i data-lucide="${response.status ? "check-square" : "x-square"}" class="w-4 h-4 mr-2"></i> ${response.status ? "ACTIVO" : "INACTIVO"
               }
               </div>`;
           },
         },
         {
-          title: "ROLE",
+          title: "RESPONSABLE",
           minWidth: 200,
-          field: "role",
-          hozAlign: "left",
-          headerHozAlign: "left",
+          field: "answerable",
+          hozAlign: "center",
+          headerHozAlign: "center",
           vertAlign: "middle",
           print: false,
           download: false,
           formatter(cell) {
             const response: any = cell.getData();
-            return response.role ? `<div>${response.role} </div>` : "";
+            return `<div class="flex items-center lg:justify-center ${response.answerable ? "text-success" : "text-danger"
+              }">
+                <i data-lucide="${response.answerable ? "check-square" : "x-square"}" class="w-4 h-4 mr-2"></i> ${response.answerable ? "RESPONSABLE" : "NO RESPONSABLE"
+              }
+              </div>`;
           },
         },
+        {
+          title: "PROVIDENCIA",
+          minWidth: 200,
+          field: "providence",
+          hozAlign: "left",
+          headerHozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+        },
+
         {
           title: "ACCIONES",
           minWidth: 200,
@@ -236,18 +244,15 @@ const reInitOnResizeWindow = () => {
     }
   });
 };
-
-
-
 </script>
 
 <template>
   <div>
     <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
-      <h2 class="mr-auto text-lg font-medium">Gestion de usuarios</h2>
+      <h2 class="mr-auto text-lg font-medium">Gestión de empleados</h2>
       <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
         <Button variant="primary" class="mr-2 shadow-md" @click="openModal = !openModal">
-          Nuevo usuario
+          <Lucide icon="Plus" class="w-4 h-4 mr-2" /> Agregar
         </Button>
       </div>
     </div>
@@ -259,29 +264,6 @@ const reInitOnResizeWindow = () => {
             <FormInput v-model="filter.search" type="search" class="mt-2 sm:w-75 2xl:w-full sm:mt-0 "
               placeholder="Buscar..." />
             <Lucide icon="Search" class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
-          </div>
-        </div>
-
-        <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0 sm:mr-4">
-          <div class="relative w-56 ">
-            <TomSelect Place v-model="filter.role" :options="{
-              placeholder: 'Buscar...',
-            }" class="w-full items-center mt-2 sm:mr-4 xl:mt-0">
-              <option value="1">Super Admin</option>
-            </TomSelect>
-          </div>
-        </div>
-        <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0 sm:mr-4">
-          <div class="relative w-56 ">
-
-            <TomSelect v-model="filter.role" :options="{
-              placeholder: 'Buscar...',
-            }" class="w-full items-center mt-2 sm:mr-4 xl:mt-0">
-              <option value="1">Habilitado</option>
-              <option value="0">Deshabilitado</option>
-
-
-            </TomSelect>
           </div>
         </div>
       </div>
@@ -304,7 +286,7 @@ const reInitOnResizeWindow = () => {
           <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
           <div class="mt-5 text-3xl">¿Esta seguro?</div>
           <div class="mt-2 text-slate-500">
-            ¿Desea eliminar este usuario? <br />
+            ¿Desea eliminar este empleado? <br />
             Una vez realizada esta accion no se podra deshacer.
           </div>
         </div>
@@ -321,7 +303,6 @@ const reInitOnResizeWindow = () => {
       </Dialog.Panel>
     </Dialog>
 
-    <CreatedOrUpdate :open="openModal" :data="editData" @close="closeForm()"
-      @refresh="onLoadData()" />
+    <CreatedOrUpdate :open="openModal" :data="editData" @close="closeForm()" @refresh="onLoadData()" />
   </div>
 </template>

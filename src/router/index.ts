@@ -17,6 +17,11 @@ import CreatedOrUpdate from "../pages/Inventory/CreatedOrUpdate.vue";
 import TermsAndConditions from "../pages/TermsAndConditions/index.vue";
 import UserManagement from "../pages/Admin/Users/index.vue";
 import RolesPermissions from "../pages/Admin/RolesAndPermissions/index.vue";
+import Employees from "../pages/HumanTalent/Employees/index.vue";
+import Departament from "../pages/HumanTalent/Departament/index.vue";
+import Charge from "../pages/HumanTalent/Chearge/index.vue";
+import Paysheet from "../pages/HumanTalent/Paysheet/index.vue";
+import Vacation from "../pages/HumanTalent/Vacations/index.vue";
 
 
 import AuthRequired from "../services/AuthRequired";
@@ -72,6 +77,31 @@ const routes = [
         path: "/roles-permissions",
         name: "roles-permissions",
         component: RolesPermissions,
+      },
+      {
+        path: "/employees",
+        name: "employees",
+        component: Employees,
+      },
+      {
+        path: "/departaments",
+        name: "departaments",
+        component: Departament,
+      },
+      {
+        path: "/charges",
+        name: "charges",
+        component: Charge,
+      },
+      {
+        path: "/paysheets",
+        name: "paysheets",
+        component: Paysheet,
+      },
+      {
+        path: "/vacations",
+        name: "vacations",
+        component: Vacation,
       },
     ],
   },
