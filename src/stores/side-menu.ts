@@ -125,6 +125,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
           },
           {
             icon: "Minus",
+            pageName: "municipality",
+            title: "Municipios",
+          },
+          {
+            icon: "Minus",
             pageName: "side-menu-dashboard-overview-1",
             title: "Proveedores",
           },
@@ -140,13 +145,8 @@ export const useSideMenuStore = defineStore("sideMenu", {
           },
           {
             icon: "Minus",
-            pageName: "side-menu-dashboard-overview-1",
-            title: "Ubicaciones",
-          },
-          {
-            icon: "Minus",
             pageName: "user-management",
-            title: "Gestion de usuarios",
+            title: "Gestión de usuarios",
           },
           {
             icon: "Minus",

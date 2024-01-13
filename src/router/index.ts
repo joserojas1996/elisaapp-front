@@ -22,6 +22,8 @@ import Departament from "../pages/HumanTalent/Departament/index.vue";
 import Charge from "../pages/HumanTalent/Chearge/index.vue";
 import Paysheet from "../pages/HumanTalent/Paysheet/index.vue";
 import Vacation from "../pages/HumanTalent/Vacations/index.vue";
+import Municipality from "../pages/Admin/Municipality/index.vue";
+
 
 
 import AuthRequired from "../services/AuthRequired";
@@ -102,6 +104,11 @@ const routes = [
         path: "/vacations",
         name: "vacations",
         component: Vacation,
+      },
+      {
+        path: "/municipality",
+        name: "municipality",
+        component: Municipality,
       },
     ],
   },
