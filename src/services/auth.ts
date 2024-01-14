@@ -1,7 +1,7 @@
 import axios from "axios";
 import { core } from "./pluginInit";
 
-const API_ENDPOINT = 'http://localhost:8000';
+const API_ENDPOINT = 'http://localhost';
 const client = axios.create({
   baseURL: API_ENDPOINT,
   headers: {

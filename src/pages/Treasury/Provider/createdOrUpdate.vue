@@ -8,22 +8,24 @@ import Button from "../../../base-components/Button";
 import { permissionsStore } from "../../../stores/Permissions";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
-import { municipalityStore } from "../../../stores/Munincipality/index";
+import { providersStore } from "../../../stores/Treasury/providers";
 import LoadingIcon from "../../../base-components/LoadingIcon"
 import { core } from "../../../services/pluginInit";
 
 interface PermissionsInterfase {
     id: string,
-    name: string
+    rif: string,
+    name: string,
 }
 
 const formData = reactive({
     id: '',
-    name: ''
+    rif: '',
+    name: '',
 });
 
 const headerFooterSlideoverPreview = ref(false);
-const store = municipalityStore();
+const store = providersStore();
 const props = defineProps({
     'foo': {
         type: Boolean,
@@ -38,11 +40,13 @@ const formRef = ref();
 const isLoading = ref(false);
 const emit = defineEmits(['refresh'])
 
+
 watch(props, (newValue, oldValue) => {
     onEdit()
     if (props.data?.id) {
-        const { id, name } = props.data
+        const { id, name, rif } = props.data
         formData.id = id
+        formData.rif = rif
         formData.name = name
     }
 })
@@ -54,7 +58,8 @@ const onEdit = () => {
 
 const rules = computed(() => {
     return {
-        name: { required, minLength: minLength(3) }
+        rif: { required, minLength: minLength(3) },
+        name: { required, minLength: minLength(3) },
     }
 });
 
@@ -69,9 +74,8 @@ const saveFormData = async () => {
     try {
         isLoading.value = true
         const response: any = await store.store(formData);
-        console.log(response)
         if (response?.status == 201) {
-            core.showSnackbar("success", response.data.message);
+            core.showSnackbar("success", `Exelente, ${!formData.id ? 'nuevo registro agregado' : 'registro actualizado'}`);
             emit('refresh');
             headerFooterSlideoverPreview.value = false
         }
@@ -84,6 +88,7 @@ const saveFormData = async () => {
 
 const reset = () => {
     formData.id = ''
+    formData.rif = ''
     formData.name = ''
 };
 
@@ -99,7 +104,7 @@ const reset = () => {
                 </a>
                 <Slideover.Title>
                     <h2 class="mr-auto text-base font-medium">
-                        Agregar nuevo Rol
+                        Agregar nuevo proveedor
                     </h2>
                 </Slideover.Title>
                 <!-- END: Slide Over Header -->
@@ -107,21 +112,37 @@ const reset = () => {
                 <Slideover.Description>
                     <div>
                         <div>
-                            <FormLabel htmlFor="modal-form-1">Nombres</FormLabel>
-                            <FormInput id="modal-form-1" type="text" placeholder="Ingrese un nombre" :class="{
+                            <FormLabel htmlFor="modal-form-1">Rif</FormLabel>
+                            <FormInput id="modal-form-1" type="text" placeholder="Ingrese un rif" :class="{
+                                'border-danger': v$.rif.$error,
+                            }" v-model.trim="v$.rif.$model" @blur="v$.rif.$touch" />
+                            <template v-if="v$.rif.$error">
+                                <div v-for="(error, index) in v$.rif.$errors" :key="index" class="mt-1 text-danger">
+                                    <span v-if="error.$validator == 'required'" class="error">
+                                        El campo es requerido
+                                    </span>
+                                    <span v-if="error.$validator == 'minLength'" class="error">
+                                        El campo debe contener al menos 8 caracteres
+                                    </span>
+                                </div>
+                            </template>
+
+                        </div>
+                        <div class="mt-3">
+                            <FormLabel htmlFor="modal-form-2">Nombre</FormLabel>
+                            <FormInput id="modal-form-2" type="text" placeholder="Ingrese un nombre" :class="{
                                 'border-danger': v$.name.$error,
                             }" v-model.trim="v$.name.$model" @blur="v$.name.$touch" />
                             <template v-if="v$.name.$error">
                                 <div v-for="(error, index) in v$.name.$errors" :key="index" class="mt-1 text-danger">
                                     <span v-if="error.$validator == 'required'" class="error">
-                                        El nombre es requerido
+                                        El campo es requerido es requerido
                                     </span>
                                     <span v-if="error.$validator == 'minLength'" class="error">
-                                        El nombre debe contener al menos 3 caracteres
+                                        El campo debe contener al menos 3 caracteres
                                     </span>
                                 </div>
                             </template>
-
                         </div>
                     </div>
                 </Slideover.Description>

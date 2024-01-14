@@ -8,7 +8,7 @@ import { onMounted, ref, reactive } from "vue";
 import { createIcons, icons } from "lucide";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { stringToHTML } from "../../../utils/helper";
-import { municipalityStore } from "../../../stores/Munincipality";
+import { institutionStore } from "../../../stores/Admin/institution";
 import CreatedOrUpdate from './createdOrUpdate.vue'
 import { core } from "../../../services/pluginInit";
 
@@ -19,7 +19,7 @@ interface Response {
   status?: string;
 }
 
-const store = municipalityStore();
+const store = institutionStore();
 const tableRef = ref<HTMLDivElement>();
 const tabulator = ref<Tabulator>();
 const headerFooterSlideoverPreview = ref(false);
@@ -31,7 +31,6 @@ const isLoading = ref(false);
 
 const filter = reactive({
   search: null,
-  status: null,
   page: 1,
   per_page: 10,
 
@@ -82,7 +81,7 @@ const deleteUser = async () => {
 const initTabulator = () => {
   if (tableRef.value) {
     tabulator.value = new Tabulator(tableRef.value, {
-      data: store.getMunicipality.data,
+      data: store.getInstitutions,
       pagination: true,
       paginationMode: "remote",
       layout: "fitColumns",
@@ -105,6 +104,34 @@ const initTabulator = () => {
           title: "NOMBRE",
           minWidth: 200,
           field: "name",
+          hozAlign: "left",
+          headerHozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+        },
+        {
+          title: "SLUG",
+          minWidth: 200,
+          field: "slug",
+          hozAlign: "left",
+          headerHozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+        },{
+          title: "DIRECCION",
+          minWidth: 200,
+          field: "address",
+          hozAlign: "left",
+          headerHozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+        },{
+          title: "DESCRIPCION",
+          minWidth: 200,
+          field: "description",
           hozAlign: "left",
           headerHozAlign: "left",
           vertAlign: "middle",
@@ -195,7 +222,7 @@ const reInitOnResizeWindow = () => {
 <template>
   <div>
     <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
-      <h2 class="mr-auto text-lg font-medium">Gestión de municipios</h2>
+      <h2 class="mr-auto text-lg font-medium">Gestión de instituciones</h2>
       <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
         <Button variant="primary" class="mr-2 shadow-md" @click="edit()">
           <Lucide icon="Plus" class="w-4 h-4 mr-2" /> Agregar
@@ -236,7 +263,7 @@ const reInitOnResizeWindow = () => {
           <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
           <div class="mt-5 text-3xl">¿Esta seguro?</div>
           <div class="mt-2 text-slate-500">
-            ¿Desea eliminar este usuario? <br />
+            ¿Desea eliminar esta institucion? <br />
             Una vez realizada esta accion no se podra deshacer.
           </div>
         </div>

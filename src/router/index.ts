@@ -23,8 +23,8 @@ import Charge from "../pages/HumanTalent/Chearge/index.vue";
 import Paysheet from "../pages/HumanTalent/Paysheet/index.vue";
 import Vacation from "../pages/HumanTalent/Vacations/index.vue";
 import Municipality from "../pages/Admin/Municipality/index.vue";
-
-
+import Providers from "../pages/Treasury/Provider/index.vue";
+import Institution from "../pages/Admin/Institution/index.vue";
 
 import AuthRequired from "../services/AuthRequired";
 
@@ -109,6 +109,16 @@ const routes = [
         path: "/municipality",
         name: "municipality",
         component: Municipality,
+      },
+      {
+        path: "/providers",
+        name: "providers",
+        component: Providers,
+      },
+      {
+        path: "/institutions",
+        name: "institutions",
+        component: Institution,
       },
     ],
   },

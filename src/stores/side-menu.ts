@@ -81,6 +81,18 @@ export const useSideMenuStore = defineStore("sideMenu", {
         ],
       },
       {
+        icon: "Coins",
+        pageName: "side-menu-dashboard",
+        title: "Tesoreria",
+        subMenu: [
+          {
+            icon: "Minus",
+            pageName: "providers",
+            title: "Proveedores",
+          }
+        ],
+      },
+      {
         icon: "Users",
         pageName: "side-menu-dashboard",
         title: "Talento Humano",
@@ -120,28 +132,13 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "Minus",
-            pageName: "side-menu-dashboard-overview-1",
-            title: "Areas",
+            pageName: "institutions",
+            title: "Instituciones",
           },
           {
             icon: "Minus",
             pageName: "municipality",
             title: "Municipios",
-          },
-          {
-            icon: "Minus",
-            pageName: "side-menu-dashboard-overview-1",
-            title: "Proveedores",
-          },
-          {
-            icon: "Minus",
-            pageName: "side-menu-page-2",
-            title: "Responsables",
-          },
-          {
-            icon: "Minus",
-            pageName: "side-menu-dashboard-overview-1",
-            title: "Tipos de pagos",
           },
           {
             icon: "Minus",

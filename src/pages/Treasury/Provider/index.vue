@@ -8,7 +8,7 @@ import { onMounted, ref, reactive } from "vue";
 import { createIcons, icons } from "lucide";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { stringToHTML } from "../../../utils/helper";
-import { municipalityStore } from "../../../stores/Munincipality";
+import { providersStore } from "../../../stores/Treasury/providers";
 import CreatedOrUpdate from './createdOrUpdate.vue'
 import { core } from "../../../services/pluginInit";
 
@@ -19,7 +19,7 @@ interface Response {
   status?: string;
 }
 
-const store = municipalityStore();
+const store = providersStore();
 const tableRef = ref<HTMLDivElement>();
 const tabulator = ref<Tabulator>();
 const headerFooterSlideoverPreview = ref(false);
@@ -27,11 +27,8 @@ const deleteButtonRef = ref();
 const deleteData = ref();
 const editData = ref({});
 
-const isLoading = ref(false);
-
 const filter = reactive({
   search: null,
-  status: null,
   page: 1,
   per_page: 10,
 
@@ -68,7 +65,6 @@ const onDelete = (data: any) => {
 };
 
 const deleteUser = async () => {
-  isLoading.value = true
   const response: any = await store.delete(deleteData.value);
 
   if (response?.status == 200) {
@@ -76,15 +72,14 @@ const deleteUser = async () => {
     setDeleteModalPreview.value = !setDeleteModalPreview.value
     onLoadData();
   }
-  isLoading.value = false
 };
 
 const initTabulator = () => {
   if (tableRef.value) {
     tabulator.value = new Tabulator(tableRef.value, {
-      data: store.getMunicipality.data,
+      data: store.getProviders.data,
       pagination: true,
-      paginationMode: "remote",
+      paginationMode: "local",
       layout: "fitColumns",
       responsiveLayout: "collapse",
       paginationInitialPage: 1,
@@ -102,7 +97,17 @@ const initTabulator = () => {
           headerSort: false,
         },
         {
-          title: "NOMBRE",
+          title: "RIF",
+          minWidth: 200,
+          field: "rif",
+          hozAlign: "left",
+          headerHozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+        },
+        {
+          title: "NAME",
           minWidth: 200,
           field: "name",
           hozAlign: "left",
@@ -111,6 +116,7 @@ const initTabulator = () => {
           print: false,
           download: false,
         },
+
         {
           title: "ESTADO",
           minWidth: 200,
@@ -195,7 +201,7 @@ const reInitOnResizeWindow = () => {
 <template>
   <div>
     <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
-      <h2 class="mr-auto text-lg font-medium">Gestión de municipios</h2>
+      <h2 class="mr-auto text-lg font-medium">Gestion de proveedores</h2>
       <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
         <Button variant="primary" class="mr-2 shadow-md" @click="edit()">
           <Lucide icon="Plus" class="w-4 h-4 mr-2" /> Agregar
@@ -236,7 +242,7 @@ const reInitOnResizeWindow = () => {
           <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
           <div class="mt-5 text-3xl">¿Esta seguro?</div>
           <div class="mt-2 text-slate-500">
-            ¿Desea eliminar este usuario? <br />
+            ¿Desea eliminar este proveedor? <br />
             Una vez realizada esta accion no se podra deshacer.
           </div>
         </div>
@@ -245,8 +251,8 @@ const reInitOnResizeWindow = () => {
             Cancelar
           </Button>
           <Button type="button" variant="danger" class="w-24" ref="{deleteButtonRef}" @click="deleteUser()"
-            :disabled="isLoading">
-            <LoadingIcon color="white" v-if="isLoading" icon="tail-spin" class="mr-1" /> {{ isLoading ? '' : 'Eliminar' }}
+            :disabled="store.isLoading">
+            <LoadingIcon color="white" v-if="store.isLoading" icon="tail-spin" class="mr-1" /> {{ store.isLoading ? '' : 'Eliminar' }}
           </Button>
         </div>
       </Dialog.Panel>
